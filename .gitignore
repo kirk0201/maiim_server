@@ -3,3 +3,6 @@ node_modules/
 
 # Compiled Dirs
 dist/
+
+# dotenv environment variables file
+.env
