@@ -1,5 +1,5 @@
-import { pickBy, isNil, negate } from 'lodash'
+import { pickBy, isNil, negate } from "lodash";
 
 export const removeNilFromObject = (object: object) => {
-  return pickBy(object, negate(isNil))
-}
+  return pickBy(object, negate(isNil));
+};

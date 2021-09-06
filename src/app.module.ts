@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { getConnectionOptions } from 'typeorm'
 import { AppController } from './app.controller';
+import { AuthTokenMiddleware } from './modules/auth/auth.token.middleware'
 import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module'
 import { OauthModule } from './modules/oauth/oauth.module'
@@ -20,4 +21,10 @@ import { OauthModule } from './modules/oauth/oauth.module'
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthTokenMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL })
+  }
+}
