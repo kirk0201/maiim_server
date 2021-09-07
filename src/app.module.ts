@@ -1,11 +1,12 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { getConnectionOptions } from 'typeorm'
-import { AppController } from './app.controller';
-import { AuthTokenMiddleware } from './modules/auth/auth.token.middleware'
-import { AppService } from './app.service';
-import { UsersModule } from './modules/users/users.module'
-import { OauthModule } from './modules/oauth/oauth.module'
+import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { getConnectionOptions } from "typeorm";
+import { AppController } from "./app.controller";
+import { AuthTokenMiddleware } from "./modules/auth/auth.token.middleware";
+import { AppService } from "./app.service";
+import { UsersModule } from "./modules/users/users.module";
+import { OauthModule } from "./modules/oauth/oauth.module";
+import { ContentsModule } from "./modules/contents/contents.module";
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { OauthModule } from './modules/oauth/oauth.module'
         }),
     }),
     UsersModule,
-    OauthModule
+    OauthModule,
+    ContentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -25,6 +27,6 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthTokenMiddleware)
-      .forRoutes({ path: '*', method: RequestMethod.ALL })
+      .forRoutes({ path: "*", method: RequestMethod.ALL });
   }
 }

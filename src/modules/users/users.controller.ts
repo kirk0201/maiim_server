@@ -16,7 +16,7 @@ import { Response } from "express";
 import { CurrentUser, ReqUser } from "../auth/auth.decorator";
 import { JwtAuthGuard } from "../auth/auth.guard";
 
-@Controller("user")
+@Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
