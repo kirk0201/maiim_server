@@ -7,6 +7,7 @@ import { AppService } from "./app.service";
 import { UsersModule } from "./modules/users/users.module";
 import { OauthModule } from "./modules/oauth/oauth.module";
 import { ContentsModule } from "./modules/contents/contents.module";
+import { MagazinesModule } from "./modules/magazines/magazines.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ContentsModule } from "./modules/contents/contents.module";
     UsersModule,
     OauthModule,
     ContentsModule,
+    MagazinesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
