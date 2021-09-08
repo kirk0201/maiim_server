@@ -6,31 +6,31 @@ import {
   AbstractEntityFindOneOptions,
   AbstractEntityRepository,
 } from "../crud/entity.repository";
-import { Content } from "./content.entity";
+import { Magazine } from "./magazine.entity";
 
-export interface ContentFindOneOptions extends AbstractEntityFindOneOptions {}
+export interface MagazineFindOneOptions extends AbstractEntityFindOneOptions {}
 
-export interface ContentFindAllWhereOptions {}
+export interface MagazineFindAllWhereOptions {}
 
-export interface ContentFindAllOptions extends AbstractEntityFindAllOptions {
-  where?: ContentFindAllWhereOptions | ContentFindAllWhereOptions[];
+export interface MagazineFindAllOptions extends AbstractEntityFindAllOptions {
+  where?: MagazineFindAllWhereOptions | MagazineFindAllWhereOptions[];
 }
 
-@EntityRepository(Content)
-export class ContentRepository extends AbstractEntityRepository<Content> {
-  public async findOne(options: ContentFindOneOptions = {}) {
+@EntityRepository(Magazine)
+export class MagazineRepository extends AbstractEntityRepository<Magazine> {
+  public async findOne(options: MagazineFindOneOptions = {}) {
     if (Object.keys(removeNilFromObject(options)).length === 0) return null;
 
     const qb = this.repository
-      .createQueryBuilder("Content")
-      .leftJoinAndSelect("Content.user", "user");
+      .createQueryBuilder("Magazine")
+      .leftJoinAndSelect("Magazine.user", "user");
 
     this.queryApplier.apply({
       qb,
       where: options,
       buildWhereOptions: ({ filterQuery, where }) => {
         const { id } = where;
-        filterQuery("Content.id", id);
+        filterQuery("Magazine.id", id);
       },
     });
 
@@ -38,12 +38,12 @@ export class ContentRepository extends AbstractEntityRepository<Content> {
   }
 
   public async findAll(
-    options: ContentFindAllOptions = {}
-  ): Promise<IPagination<Content>> {
+    options: MagazineFindAllOptions = {}
+  ): Promise<IPagination<Magazine>> {
     const { where, skip, take } = options;
 
-    const qb = this.createQueryBuilder("Content").leftJoinAndSelect(
-      "Content.user",
+    const qb = this.createQueryBuilder("Magazine").leftJoinAndSelect(
+      "Magazine.user",
       "user"
     );
 
@@ -58,7 +58,7 @@ export class ContentRepository extends AbstractEntityRepository<Content> {
     qb.skip(skip ?? 0);
     qb.take(take ?? 20);
 
-    qb.orderBy("Content.id", "DESC");
+    qb.orderBy("Magazine.id", "DESC");
 
     const [items, total] = await qb.getManyAndCount();
 
