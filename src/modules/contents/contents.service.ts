@@ -38,9 +38,9 @@ export class ContentsService {
   }
 
   public async update(content: any, contentId: number, userId: number) {
-    const findContent = await this.findOne({ id: contentId });
+    const findContent = await this.contentRepository.findOne({ id: contentId });
 
-    if (!findContent) throw new NotFoundException("게시물이 없습니다");
+    if (!findContent) throw new NotFoundException("해당 게시물이 없습니다");
 
     if (findContent.userId !== userId)
       throw new UnauthorizedException("권한이 없습니다");
@@ -49,9 +49,9 @@ export class ContentsService {
   }
 
   public async delete(contentId: number, userId: number) {
-    const findContent = await this.findOne({ id: contentId });
+    const findContent = await this.contentRepository.findOne({ id: contentId });
 
-    if (!findContent) throw new NotFoundException("게시물이 없습니다");
+    if (!findContent) throw new NotFoundException("해당 게시물이 없습니다");
 
     if (findContent.userId !== userId)
       throw new UnauthorizedException("권한이 없습니다");
