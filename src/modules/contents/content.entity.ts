@@ -14,7 +14,7 @@ export class Content {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => User, { onDelete: "RESTRICT" })
+  @ManyToOne((type) => User, { onDelete: "CASCADE" })
   @JoinColumn()
   user: User;
 
