@@ -5,12 +5,14 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { Content } from "./content.entity";
+import { ContentComment } from "./content.comment.entity";
 import {
   ContentFindAllOptions,
   ContentFindOneOptions,
   ContentRepository,
+  ContentCommentFindAllOptions,
 } from "./content.repository";
-import { CreateContentDto } from "./contents.dto";
+import { CreateContentDto, CreateCommentDto } from "./contents.dto";
 
 @Injectable()
 export class ContentsService {
@@ -57,5 +59,63 @@ export class ContentsService {
       throw new UnauthorizedException("권한이 없습니다");
 
     await this.contentRepository.delete(contentId);
+  }
+
+  public async comment(
+    createCommentDto: CreateCommentDto,
+    contentId: number,
+    userId: number
+  ) {
+    const { body } = createCommentDto;
+
+    const comment = new ContentComment({ body, contentId, userId });
+    await this.contentRepository.saveContentComment(comment);
+    return this.contentRepository.findOneContentComment({
+      id: comment.id,
+      contentId: contentId,
+      userId: userId,
+    });
+  }
+
+  public async findAllContentComment(options?: ContentCommentFindAllOptions) {
+    const comment = await this.contentRepository.findAllContentComment(options);
+    return comment;
+  }
+
+  public async commentUpdate(
+    comment: any,
+    commentId: number,
+    contentId: number,
+    userId: number
+  ) {
+    const findComment = await this.contentRepository.findOneContentComment({
+      id: commentId,
+      contentId: contentId,
+    });
+
+    if (!findComment) throw new NotFoundException("해당 게시물이 없습니다");
+
+    if (findComment.userId !== userId)
+      throw new UnauthorizedException("권한이 없습니다");
+
+    await this.contentRepository.updateContentComment(commentId, comment);
+  }
+
+  public async commentDelete(
+    commentId: number,
+    contentId: number,
+    userId: number
+  ) {
+    const findComment = await this.contentRepository.findOneContentComment({
+      id: commentId,
+      contentId: contentId,
+    });
+
+    if (!findComment) throw new NotFoundException("해당 게시물이 없습니다");
+
+    if (findComment.userId !== userId)
+      throw new UnauthorizedException("권한이 없습니다");
+
+    await this.contentRepository.deleteContentComment(commentId);
   }
 }

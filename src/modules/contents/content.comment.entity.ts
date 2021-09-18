@@ -8,9 +8,10 @@ import {
   Column,
 } from "typeorm";
 import { User } from "../users/user.entity";
+import { Content } from "./content.entity";
 
-@Entity({ name: "magazine" })
-export class Magazine {
+@Entity({ name: "contentComment" })
+export class ContentComment {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,11 +23,13 @@ export class Magazine {
   @Index()
   userId: number;
 
-  @Column({ type: "varchar" })
-  photo: string;
+  @ManyToOne((type) => Content, { onDelete: "CASCADE" })
+  @JoinColumn()
+  content: Content;
 
-  @Column({ type: "varchar" })
-  title: string;
+  @Column()
+  @Index()
+  contentId: number;
 
   @Column({ type: "varchar" })
   body: string;
@@ -34,7 +37,7 @@ export class Magazine {
   @CreateDateColumn()
   createdAt: Date;
 
-  constructor(partial?: Partial<Magazine>) {
+  constructor(partial?: Partial<ContentComment>) {
     return Object.assign(this, partial);
   }
 }
