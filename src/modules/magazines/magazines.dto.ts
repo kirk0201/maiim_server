@@ -10,3 +10,8 @@ export class CreateMagazineDto {
   @IsNotEmpty({ message: "내용을 입력하세요" })
   body: string;
 }
+
+export class CreateCommentDto {
+  @IsNotEmpty({ message: "내용을 입력하세요" })
+  body: string;
+}

@@ -5,12 +5,14 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { Magazine } from "./magazine.entity";
+import { MagazineComment } from "./magazine.comment.entity";
 import {
   MagazineFindAllOptions,
   MagazineFindOneOptions,
   MagazineRepository,
+  MagazineCommentFindAllOptions,
 } from "./magazine.repository";
-import { CreateMagazineDto } from "./magazines.dto";
+import { CreateMagazineDto, CreateCommentDto } from "./magazines.dto";
 
 @Injectable()
 export class MagazinesService {
@@ -62,5 +64,65 @@ export class MagazinesService {
       throw new UnauthorizedException("권한이 없습니다");
 
     await this.magazineRepository.delete(magazineId);
+  }
+
+  public async comment(
+    createCommentDto: CreateCommentDto,
+    magazineId: number,
+    userId: number
+  ) {
+    const { body } = createCommentDto;
+
+    const comment = new MagazineComment({ body, magazineId, userId });
+    await this.magazineRepository.saveMagazineComment(comment);
+    return this.magazineRepository.findOneMagazineComment({
+      id: comment.id,
+      magazineId: magazineId,
+      userId: userId,
+    });
+  }
+
+  public async findAllMagazineComment(options?: MagazineCommentFindAllOptions) {
+    const comment = await this.magazineRepository.findAllMagazineComment(
+      options
+    );
+    return comment;
+  }
+
+  public async commentUpdate(
+    comment: any,
+    commentId: number,
+    magazineId: number,
+    userId: number
+  ) {
+    const findComment = await this.magazineRepository.findOneMagazineComment({
+      id: commentId,
+      magazineId: magazineId,
+    });
+
+    if (!findComment) throw new NotFoundException("해당 게시물이 없습니다");
+
+    if (findComment.userId !== userId)
+      throw new UnauthorizedException("권한이 없습니다");
+
+    await this.magazineRepository.updateMagazineComment(commentId, comment);
+  }
+
+  public async commentDelete(
+    commentId: number,
+    magazineId: number,
+    userId: number
+  ) {
+    const findComment = await this.magazineRepository.findOneMagazineComment({
+      id: commentId,
+      magazineId: magazineId,
+    });
+
+    if (!findComment) throw new NotFoundException("해당 게시물이 없습니다");
+
+    if (findComment.userId !== userId)
+      throw new UnauthorizedException("권한이 없습니다");
+
+    await this.magazineRepository.deleteMagazineComment(commentId);
   }
 }

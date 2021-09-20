@@ -12,7 +12,7 @@ import {
   ParseIntPipe,
 } from "@nestjs/common";
 import { CurrentUser, ReqUser } from "../auth/auth.decorator";
-import { CreateMagazineDto } from "./magazines.dto";
+import { CreateMagazineDto, CreateCommentDto } from "./magazines.dto";
 import { MagazinesService } from "./magazines.service";
 import { JwtAuthGuard } from "../auth/auth.guard";
 
@@ -33,7 +33,9 @@ export class MagazinesController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
   public async findOne(@Param("id", ParseIntPipe) id: number) {
-    return this.magazineService.findOne({ id });
+    const magazine = await this.magazineService.findOne({ id });
+    const comment = await this.magazineService.findAllMagazineComment({ id });
+    return { magazine, comment };
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -62,5 +64,38 @@ export class MagazinesController {
   ) {
     await this.magazineService.delete(id, userId);
     return "매거진 삭제 완료!";
+  }
+
+  @Post(":id/commentCreate")
+  @UseGuards(JwtAuthGuard)
+  public async comment(
+    @Body() createCommentDto: CreateCommentDto,
+    @Param("id", ParseIntPipe) id: number,
+    @ReqUser() { id: userId }: CurrentUser
+  ) {
+    return this.magazineService.comment(createCommentDto, id, userId);
+  }
+
+  @Put(":id/:commentId/commentUpdate")
+  @UseGuards(JwtAuthGuard)
+  public async commentUpdate(
+    @Body() comment: any,
+    @Param("id", ParseIntPipe) id: number,
+    @Param("commentId", ParseIntPipe) commentId: number,
+    @ReqUser() { id: userId }: CurrentUser
+  ) {
+    await this.magazineService.commentUpdate(comment, commentId, id, userId);
+    return "댓글 수정 완료!";
+  }
+
+  @Delete(":id/:commentId/commentDelete")
+  @UseGuards(JwtAuthGuard)
+  public async commentDelete(
+    @Param("id", ParseIntPipe) id: number,
+    @Param("commentId", ParseIntPipe) commentId: number,
+    @ReqUser() { id: userId }: CurrentUser
+  ) {
+    await this.magazineService.commentDelete(commentId, id, userId);
+    return "댓글 삭제 완료!";
   }
 }

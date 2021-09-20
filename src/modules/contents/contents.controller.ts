@@ -66,7 +66,6 @@ export class ContentsController {
     return "게시글 삭제 완료!";
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Post(":id/commentCreate")
   @UseGuards(JwtAuthGuard)
   public async comment(
