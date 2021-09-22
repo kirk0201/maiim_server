@@ -8,6 +8,7 @@ import { UsersModule } from "./modules/users/users.module";
 import { OauthModule } from "./modules/oauth/oauth.module";
 import { ContentsModule } from "./modules/contents/contents.module";
 import { MagazinesModule } from "./modules/magazines/magazines.module";
+import { ItemsModule } from "./modules/items/items.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MagazinesModule } from "./modules/magazines/magazines.module";
     OauthModule,
     ContentsModule,
     MagazinesModule,
+    ItemsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
