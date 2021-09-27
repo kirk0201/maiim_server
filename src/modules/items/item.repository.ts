@@ -6,14 +6,13 @@ import {
   AbstractEntityFindAllOptions,
   AbstractEntityFindOneOptions,
   AbstractEntityRepository,
+  EntityFindOperator,
 } from "../crud/entity.repository";
 
 export interface ItemFindOneOptions extends AbstractEntityFindOneOptions {}
 
-export interface ItemFindAllWhereOptions {}
-
 export interface ItemFindAllOptions extends AbstractEntityFindAllOptions {
-  where?: ItemFindAllWhereOptions | ItemFindAllWhereOptions[];
+  category?: EntityFindOperator<string>;
 }
 
 @EntityRepository(Item)
@@ -38,15 +37,16 @@ export class ItemRepository extends AbstractEntityRepository<Item> {
   public async findAll(
     options: ItemFindAllOptions = {}
   ): Promise<IPagination<Item>> {
-    const { where, skip, take } = options;
+    const { skip, take } = options;
 
     const qb = this.createQueryBuilder("Item");
 
     this.queryApplier.apply({
       qb,
-      where,
+      where: options,
       buildWhereOptions: ({ filterQuery, where }) => {
-        const {} = where;
+        const { category } = where;
+        filterQuery("Item.category", category);
       },
     });
 
