@@ -106,7 +106,9 @@ export class MagazineRepository extends AbstractEntityRepository<Magazine> {
   ) {
     const magazineCommentRepository =
       this.manager.getRepository(MagazineComment);
-    const qb = magazineCommentRepository.createQueryBuilder("MagazineComment");
+    const qb = magazineCommentRepository
+      .createQueryBuilder("MagazineComment")
+      .leftJoinAndSelect("MagazineComment.user", "user");
 
     this.queryApplier.apply({
       qb,

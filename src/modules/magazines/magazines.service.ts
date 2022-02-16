@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { Magazine } from "./magazine.entity";
 import { MagazineComment } from "./magazine.comment.entity";
+import { UserRepository } from "../users/user.repository";
 import {
   MagazineFindAllOptions,
   MagazineFindOneOptions,
@@ -16,10 +17,18 @@ import { CreateMagazineDto, CreateCommentDto } from "./magazines.dto";
 
 @Injectable()
 export class MagazinesService {
-  constructor(private readonly magazineRepository: MagazineRepository) {}
+  constructor(
+    private readonly magazineRepository: MagazineRepository,
+    private readonly userRepository: UserRepository
+  ) {}
 
   public async create(createMagazineDto: CreateMagazineDto, userId: number) {
     const { photo, title, body } = createMagazineDto;
+
+    const findManager = await this.userRepository.findOne({ id: userId });
+
+    if (findManager.name !== "김대원")
+      throw new UnauthorizedException("권한이 없습니다.");
 
     if (title.length > 30)
       throw new ForbiddenException("제목은 30자를 넘을 수 없습니다.");
@@ -31,7 +40,7 @@ export class MagazinesService {
 
   public async findOne(options?: MagazineFindOneOptions) {
     const magazine = await this.magazineRepository.findOne(options);
-    if (!magazine) throw new NotFoundException("매거진이 없습니다");
+    if (!magazine) throw new NotFoundException("매거진이 없습니다.");
     return magazine;
   }
 
@@ -44,10 +53,15 @@ export class MagazinesService {
       id: magazineId,
     });
 
-    if (!findMagazine) throw new NotFoundException("해당 매거진이 없습니다");
+    if (!findMagazine) throw new NotFoundException("해당 매거진이 없습니다.");
 
-    if (findMagazine.userId !== userId)
-      throw new UnauthorizedException("권한이 없습니다");
+    const findManager = await this.userRepository.findOne({ id: userId });
+
+    if (findManager.name !== "김대원")
+      throw new UnauthorizedException("권한이 없습니다.");
+
+    if (magazine.title.length > 30)
+      throw new ForbiddenException("제목은 30자를 넘을 수 없습니다.");
 
     await this.magazineRepository.update(magazineId, magazine);
   }
@@ -58,10 +72,12 @@ export class MagazinesService {
       id: magazineId,
     });
 
-    if (!findMagazine) throw new NotFoundException("해당 매거진이 없습니다");
+    if (!findMagazine) throw new NotFoundException("해당 매거진이 없습니다.");
 
-    if (findMagazine.userId !== userId)
-      throw new UnauthorizedException("권한이 없습니다");
+    const findManager = await this.userRepository.findOne({ id: userId });
+
+    if (findManager.name !== "김대원")
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.magazineRepository.delete(magazineId);
   }
@@ -100,10 +116,10 @@ export class MagazinesService {
       magazineId: magazineId,
     });
 
-    if (!findComment) throw new NotFoundException("해당 게시물이 없습니다");
+    if (!findComment) throw new NotFoundException("해당 댓글이 없습니다.");
 
     if (findComment.userId !== userId)
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.magazineRepository.updateMagazineComment(commentId, comment);
   }
@@ -118,10 +134,10 @@ export class MagazinesService {
       magazineId: magazineId,
     });
 
-    if (!findComment) throw new NotFoundException("해당 게시물이 없습니다");
+    if (!findComment) throw new NotFoundException("해당 댓글이 없습니다.");
 
     if (findComment.userId !== userId)
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.magazineRepository.deleteMagazineComment(commentId);
   }

@@ -65,10 +65,26 @@ export class UsersService {
   }
 
   public async update(user: any, id: number) {
-    // console.log("유저 아이디", id);
+    let { nickname } = user;
+    const regexAlpaAndNumeric = /^(?=.*[0-9])(?=.*[a-z])/;
+
     if (user.password) {
+      if (!regexAlpaAndNumeric.test(user.password)) {
+        throw new ForbiddenException(
+          "비밀번호에 영문과 숫자를 포함시켜 주세요."
+        );
+      }
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(user.password, salt);
+    }
+
+    if (nickname) {
+      if (nickname.length > 10)
+        throw new ForbiddenException("닉네임이 10자 초과합니다.");
+
+      const findNickNameUser = await this.userRepository.findOne({ nickname });
+      if (findNickNameUser)
+        throw new ForbiddenException("닉네임이 이미 존재합니다.");
     }
 
     await this.userRepository.update(id, user);

@@ -27,7 +27,7 @@ export class ItemsService {
     const findManager = await this.userRepository.findOne({ id: userId });
 
     if (findManager.name !== "김대원")
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.itemRepository.save(item);
     return this.itemRepository.findOne({ id: item.id });
@@ -35,7 +35,7 @@ export class ItemsService {
 
   public async findOne(options?: ItemFindOneOptions) {
     const item = await this.itemRepository.findOne(options);
-    if (!item) throw new NotFoundException("상품이 없습니다");
+    if (!item) throw new NotFoundException("상품이 없습니다.");
     return item;
   }
 
@@ -46,12 +46,12 @@ export class ItemsService {
   public async update(item: any, itemId: number, userId: number) {
     const findItem = await this.itemRepository.findOne({ id: itemId });
 
-    if (!findItem) throw new NotFoundException("해당 상품이 없습니다");
+    if (!findItem) throw new NotFoundException("해당 상품이 없습니다.");
 
     const findManager = await this.userRepository.findOne({ id: userId });
 
     if (findManager.name !== "김대원")
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.itemRepository.update(itemId, item);
   }
@@ -59,12 +59,12 @@ export class ItemsService {
   public async delete(itemId: number, userId: number) {
     const findItem = await this.itemRepository.findOne({ id: itemId });
 
-    if (!findItem) throw new NotFoundException("해당 상품이 없습니다");
+    if (!findItem) throw new NotFoundException("해당 상품이 없습니다.");
 
     const findManager = await this.userRepository.findOne({ id: userId });
 
     if (findManager.name !== "김대원")
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.itemRepository.delete(itemId);
   }

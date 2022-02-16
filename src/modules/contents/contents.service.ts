@@ -31,7 +31,7 @@ export class ContentsService {
 
   public async findOne(options?: ContentFindOneOptions) {
     const content = await this.contentRepository.findOne(options);
-    if (!content) throw new NotFoundException("게시물이 없습니다");
+    if (!content) throw new NotFoundException("게시물이 없습니다.");
     return content;
   }
 
@@ -42,10 +42,13 @@ export class ContentsService {
   public async update(content: any, contentId: number, userId: number) {
     const findContent = await this.contentRepository.findOne({ id: contentId });
 
-    if (!findContent) throw new NotFoundException("해당 게시물이 없습니다");
+    if (!findContent) throw new NotFoundException("해당 게시물이 없습니다.");
+
+    if (content.title.length > 30)
+      throw new ForbiddenException("제목은 30자를 넘을 수 없습니다.");
 
     if (findContent.userId !== userId)
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.contentRepository.update(contentId, content);
   }
@@ -53,10 +56,10 @@ export class ContentsService {
   public async delete(contentId: number, userId: number) {
     const findContent = await this.contentRepository.findOne({ id: contentId });
 
-    if (!findContent) throw new NotFoundException("해당 게시물이 없습니다");
+    if (!findContent) throw new NotFoundException("해당 게시물이 없습니다.");
 
     if (findContent.userId !== userId)
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.contentRepository.delete(contentId);
   }
@@ -70,6 +73,7 @@ export class ContentsService {
 
     const comment = new ContentComment({ body, contentId, userId });
     await this.contentRepository.saveContentComment(comment);
+
     return this.contentRepository.findOneContentComment({
       id: comment.id,
       contentId: contentId,
@@ -93,10 +97,10 @@ export class ContentsService {
       contentId: contentId,
     });
 
-    if (!findComment) throw new NotFoundException("해당 게시물이 없습니다");
+    if (!findComment) throw new NotFoundException("해당 댓글이 없습니다.");
 
     if (findComment.userId !== userId)
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.contentRepository.updateContentComment(commentId, comment);
   }
@@ -111,10 +115,10 @@ export class ContentsService {
       contentId: contentId,
     });
 
-    if (!findComment) throw new NotFoundException("해당 게시물이 없습니다");
+    if (!findComment) throw new NotFoundException("해당 댓글이 없습니다.");
 
     if (findComment.userId !== userId)
-      throw new UnauthorizedException("권한이 없습니다");
+      throw new UnauthorizedException("권한이 없습니다.");
 
     await this.contentRepository.deleteContentComment(commentId);
   }
