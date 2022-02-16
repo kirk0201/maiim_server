@@ -104,7 +104,9 @@ export class ContentRepository extends AbstractEntityRepository<Content> {
     options: ContentCommentFindAllOptions = {}
   ) {
     const contentCommentRepository = this.manager.getRepository(ContentComment);
-    const qb = contentCommentRepository.createQueryBuilder("ContentComment");
+    const qb = contentCommentRepository
+      .createQueryBuilder("ContentComment")
+      .leftJoinAndSelect("ContentComment.user", "user");
 
     this.queryApplier.apply({
       qb,
