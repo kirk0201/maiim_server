@@ -18,7 +18,13 @@ import {
   ApiForbiddenResponse,
   ApiBadRequestResponse,
 } from "@nestjs/swagger";
-import { joinUserDto, loginDto } from "./users.dto";
+import {
+  JoinUserDto,
+  LoginDto,
+  UpdateUserDto,
+  FindEmailDto,
+  FindPwDto,
+} from "./users.dto";
 import { UsersService } from "./users.service";
 import { Response } from "express";
 import { CurrentUser, ReqUser } from "../auth/auth.decorator";
@@ -53,8 +59,8 @@ export class UsersController {
       },
     },
   })
-  public async joinUser(@Body() joinUserDto: joinUserDto) {
-    await this.usersService.joinUser(joinUserDto);
+  public async joinUser(@Body() userData: JoinUserDto) {
+    await this.usersService.joinUser(userData);
     return "회원가입 성공!";
   }
 
@@ -98,10 +104,10 @@ export class UsersController {
     },
   })
   public async login(
-    @Body() loginDto: loginDto,
+    @Body() login: LoginDto,
     @Res({ passthrough: true }) res: Response
   ) {
-    const { token, findUser } = await this.usersService.login(loginDto);
+    const { token, findUser } = await this.usersService.login(login);
     res.cookie("token", token, {
       domain: "localhost",
       path: "/",
@@ -209,10 +215,10 @@ export class UsersController {
     },
   })
   public async update(
-    @Body() user: any,
+    @Body() updateUser: UpdateUserDto,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    await this.usersService.update(user, userId);
+    await this.usersService.update(updateUser, userId);
     return "유저정보 수정!";
   }
 
@@ -227,5 +233,63 @@ export class UsersController {
   public async delete(@ReqUser() { id: userId }: CurrentUser) {
     await this.usersService.delete(userId);
     return "회원탈퇴 완료!";
+  }
+
+  @Post("findEmail")
+  @ApiOperation({
+    summary: "유저 이메일 찾기",
+    description: "유저 이메일 찾기 api",
+  })
+  @ApiCreatedResponse({
+    description: "성공여부",
+    schema: { example: { email: "kkt12121@naver.com" } },
+  })
+  @ApiBadRequestResponse({
+    description: "오류코드",
+    schema: {
+      example: {
+        message: "이름을 입력해주세요. || 핸드폰 번호를 입력해주세요.",
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: "오류코드",
+    schema: {
+      example: {
+        message: "일치하는 회원이 없습니다.",
+      },
+    },
+  })
+  public async findEmail(@Body() userData: FindEmailDto) {
+    return this.usersService.findEmail(userData);
+  }
+
+  @Post("findPw")
+  @ApiOperation({
+    summary: "유저 비밀번호 찾기",
+    description: "유저 비밀번호 찾기 api",
+  })
+  @ApiCreatedResponse({
+    description: "성공여부",
+    schema: { example: { success: true } },
+  })
+  @ApiBadRequestResponse({
+    description: "오류코드",
+    schema: {
+      example: {
+        message: "이름을 입력해주세요. || 이메일 형식으로 입력해주세요.",
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: "오류코드",
+    schema: {
+      example: {
+        message: "일치하는 회원이 없습니다.",
+      },
+    },
+  })
+  public async findPw(@Body() userData: FindPwDto) {
+    return this.usersService.findPw(userData);
   }
 }

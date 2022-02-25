@@ -1,4 +1,5 @@
 import { IsNotEmpty } from "class-validator";
+import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateMagazineDto {
@@ -35,4 +36,35 @@ export class CreateCommentDto {
     required: true,
   })
   body: string;
+}
+
+export class UpdateMagazineDto extends PartialType(CreateMagazineDto) {
+  @ApiProperty({
+    example: "사진 변경",
+    description: "photo",
+    required: false,
+  })
+  photo?: string;
+
+  @ApiProperty({
+    example: "제목 변경",
+    description: "title",
+    required: false,
+  })
+  title?: string;
+
+  @ApiProperty({
+    example: "내용 변경",
+    description: "body",
+    required: false,
+  })
+  body?: string;
+}
+export class UpdateCommentDto extends PartialType(CreateCommentDto) {
+  @ApiProperty({
+    example: "댓글 내용 수정",
+    description: "body",
+    required: false,
+  })
+  body?: string;
 }

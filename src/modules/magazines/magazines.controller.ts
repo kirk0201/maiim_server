@@ -17,11 +17,17 @@ import {
   ApiTags,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiParam,
   ApiForbiddenResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
 } from "@nestjs/swagger";
-import { CreateMagazineDto, CreateCommentDto } from "./magazines.dto";
+import {
+  CreateMagazineDto,
+  CreateCommentDto,
+  UpdateMagazineDto,
+  UpdateCommentDto,
+} from "./magazines.dto";
 import { MagazinesService } from "./magazines.service";
 import { JwtAuthGuard } from "../auth/auth.guard";
 
@@ -77,15 +83,20 @@ export class MagazinesController {
     },
   })
   public async create(
-    @Body() createMagazineDto: CreateMagazineDto,
+    @Body() magazineData: CreateMagazineDto,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    return this.magazineService.create(createMagazineDto, userId);
+    return this.magazineService.create(magazineData, userId);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
   @ApiOperation({ summary: "매거진 조회", description: "매거진 조회 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "magazineId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: {
@@ -224,6 +235,11 @@ export class MagazinesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "매거진 수정", description: "매거진 수정 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "magazineId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: { example: { message: "매거진 수정 완료!" } },
@@ -245,11 +261,11 @@ export class MagazinesController {
     },
   })
   public async update(
-    @Body() magazine: any,
+    @Body() updateMagazine: UpdateMagazineDto,
     @Param("id", ParseIntPipe) id: number,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    await this.magazineService.update(magazine, id, userId);
+    await this.magazineService.update(updateMagazine, id, userId);
     return "매거진 수정 완료!";
   }
 
@@ -257,6 +273,11 @@ export class MagazinesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "매거진 삭제", description: "매거진 삭제 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "magazineId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: { example: { message: "매거진 삭제 완료!" } },
@@ -281,6 +302,11 @@ export class MagazinesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "댓글 작성", description: "댓글 작성 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "magazineId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: {
@@ -302,17 +328,27 @@ export class MagazinesController {
     },
   })
   public async comment(
-    @Body() createCommentDto: CreateCommentDto,
+    @Body() commentData: CreateCommentDto,
     @Param("id", ParseIntPipe) id: number,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    return this.magazineService.comment(createCommentDto, id, userId);
+    return this.magazineService.comment(commentData, id, userId);
   }
 
   @Put(":id/:commentId/commentUpdate")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "댓글 수정", description: "댓글 수정 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "magazineId",
+  })
+  @ApiParam({
+    name: "commentId",
+    required: true,
+    description: "commentId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: { example: { message: "댓글 수정 완료!" } },
@@ -326,12 +362,17 @@ export class MagazinesController {
     },
   })
   public async commentUpdate(
-    @Body() comment: any,
+    @Body() updateComment: UpdateCommentDto,
     @Param("id", ParseIntPipe) id: number,
     @Param("commentId", ParseIntPipe) commentId: number,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    await this.magazineService.commentUpdate(comment, commentId, id, userId);
+    await this.magazineService.commentUpdate(
+      updateComment,
+      commentId,
+      id,
+      userId
+    );
     return "댓글 수정 완료!";
   }
 
@@ -339,6 +380,16 @@ export class MagazinesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "댓글 삭제", description: "댓글 삭제 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "magazineId",
+  })
+  @ApiParam({
+    name: "commentId",
+    required: true,
+    description: "commentId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: { example: { message: "댓글 삭제 완료!" } },

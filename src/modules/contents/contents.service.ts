@@ -12,14 +12,19 @@ import {
   ContentRepository,
   ContentCommentFindAllOptions,
 } from "./content.repository";
-import { CreateContentDto, CreateCommentDto } from "./contents.dto";
+import {
+  CreateContentDto,
+  CreateCommentDto,
+  UpdateContentDto,
+  UpdateCommentDto,
+} from "./contents.dto";
 
 @Injectable()
 export class ContentsService {
   constructor(private readonly contentRepository: ContentRepository) {}
 
-  public async create(createContentDto: CreateContentDto, userId: number) {
-    const { tag, title, body } = createContentDto;
+  public async create(contentData: CreateContentDto, userId: number) {
+    const { tag, title, body } = contentData;
 
     if (title.length > 30)
       throw new ForbiddenException("제목은 30자를 넘을 수 없습니다.");
@@ -39,18 +44,22 @@ export class ContentsService {
     return this.contentRepository.findAll(options);
   }
 
-  public async update(content: any, contentId: number, userId: number) {
+  public async update(
+    updateContent: UpdateContentDto,
+    contentId: number,
+    userId: number
+  ) {
     const findContent = await this.contentRepository.findOne({ id: contentId });
 
     if (!findContent) throw new NotFoundException("해당 게시물이 없습니다.");
 
-    if (content.title.length > 30)
+    if (updateContent.title.length > 30)
       throw new ForbiddenException("제목은 30자를 넘을 수 없습니다.");
 
     if (findContent.userId !== userId)
       throw new UnauthorizedException("권한이 없습니다.");
 
-    await this.contentRepository.update(contentId, content);
+    await this.contentRepository.update(contentId, updateContent);
   }
 
   public async delete(contentId: number, userId: number) {
@@ -65,11 +74,11 @@ export class ContentsService {
   }
 
   public async comment(
-    createCommentDto: CreateCommentDto,
+    commentData: CreateCommentDto,
     contentId: number,
     userId: number
   ) {
-    const { body } = createCommentDto;
+    const { body } = commentData;
 
     const comment = new ContentComment({ body, contentId, userId });
     await this.contentRepository.saveContentComment(comment);
@@ -87,7 +96,7 @@ export class ContentsService {
   }
 
   public async commentUpdate(
-    comment: any,
+    updateComment: UpdateCommentDto,
     commentId: number,
     contentId: number,
     userId: number
@@ -102,7 +111,7 @@ export class ContentsService {
     if (findComment.userId !== userId)
       throw new UnauthorizedException("권한이 없습니다.");
 
-    await this.contentRepository.updateContentComment(commentId, comment);
+    await this.contentRepository.updateContentComment(commentId, updateComment);
   }
 
   public async commentDelete(
