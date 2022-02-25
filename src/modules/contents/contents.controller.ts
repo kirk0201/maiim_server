@@ -16,12 +16,18 @@ import {
   ApiOperation,
   ApiTags,
   ApiCreatedResponse,
+  ApiParam,
   ApiForbiddenResponse,
   ApiBearerAuth,
   ApiNotFoundResponse,
   ApiBadRequestResponse,
 } from "@nestjs/swagger";
-import { CreateContentDto, CreateCommentDto } from "./contents.dto";
+import {
+  CreateContentDto,
+  CreateCommentDto,
+  UpdateContentDto,
+  UpdateCommentDto,
+} from "./contents.dto";
 import { ContentsService } from "./contents.service";
 import { JwtAuthGuard } from "../auth/auth.guard";
 
@@ -77,15 +83,20 @@ export class ContentsController {
     },
   })
   public async create(
-    @Body() createContentDto: CreateContentDto,
+    @Body() contentData: CreateContentDto,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    return this.contentService.create(createContentDto, userId);
+    return this.contentService.create(contentData, userId);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
   @ApiOperation({ summary: "게시물 조회", description: "게시물 조회 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "contentId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: {
@@ -224,6 +235,11 @@ export class ContentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "게시물 수정", description: "게시물 수정 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "contentId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: { example: { message: "게시물 수정 완료!" } },
@@ -247,9 +263,9 @@ export class ContentsController {
   public async update(
     @Param("id", ParseIntPipe) id: number,
     @ReqUser() { id: userId }: CurrentUser,
-    @Body() content: any
+    @Body() updateContent: UpdateContentDto
   ) {
-    await this.contentService.update(content, id, userId);
+    await this.contentService.update(updateContent, id, userId);
     return "게시물 수정 완료!";
   }
 
@@ -257,6 +273,11 @@ export class ContentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "게시물 삭제", description: "게시물 삭제 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "contentId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: { example: { message: "게시물 삭제 완료!" } },
@@ -281,6 +302,11 @@ export class ContentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "댓글 작성", description: "댓글 작성 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "contentId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: {
@@ -302,17 +328,27 @@ export class ContentsController {
     },
   })
   public async comment(
-    @Body() createCommentDto: CreateCommentDto,
+    @Body() commentData: CreateCommentDto,
     @Param("id", ParseIntPipe) id: number,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    return this.contentService.comment(createCommentDto, id, userId);
+    return this.contentService.comment(commentData, id, userId);
   }
 
   @Put(":id/:commentId/commentUpdate")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "댓글 수정", description: "댓글 수정 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "contentId",
+  })
+  @ApiParam({
+    name: "commentId",
+    required: true,
+    description: "commentId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: { example: { message: "댓글 수정 완료!" } },
@@ -326,12 +362,17 @@ export class ContentsController {
     },
   })
   public async commentUpdate(
-    @Body() comment: any,
+    @Body() updateComment: UpdateCommentDto,
     @Param("id", ParseIntPipe) id: number,
     @Param("commentId", ParseIntPipe) commentId: number,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    await this.contentService.commentUpdate(comment, commentId, id, userId);
+    await this.contentService.commentUpdate(
+      updateComment,
+      commentId,
+      id,
+      userId
+    );
     return "댓글 수정 완료!";
   }
 
@@ -339,6 +380,16 @@ export class ContentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "댓글 삭제", description: "댓글 삭제 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "contentId",
+  })
+  @ApiParam({
+    name: "commentId",
+    required: true,
+    description: "commentId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: { example: { message: "댓글 삭제 완료!" } },

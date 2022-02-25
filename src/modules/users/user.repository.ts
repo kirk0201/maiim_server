@@ -12,6 +12,8 @@ import {
 export interface UserFindOneOptions extends AbstractEntityFindOneOptions {
   email?: EntityFindOperator<string>;
   nickname?: EntityFindOperator<string>;
+  name?: EntityFindOperator<string>;
+  phone?: EntityFindOperator<string>;
 }
 
 export interface UserFindAllWhereOptions {}
@@ -31,10 +33,12 @@ export class UserRepository extends AbstractEntityRepository<User> {
       qb,
       where: options,
       buildWhereOptions: ({ filterQuery, where }) => {
-        const { id, email, nickname } = where;
+        const { id, email, nickname, name, phone } = where;
         filterQuery("User.id", id);
         filterQuery("User.email", email);
         filterQuery("User.nickname", nickname);
+        filterQuery("User.name", name);
+        filterQuery("User.phone", phone);
       },
     });
 

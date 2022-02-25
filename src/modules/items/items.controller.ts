@@ -10,12 +10,13 @@ import {
   ParseIntPipe,
   Query,
 } from "@nestjs/common";
-import { CreateItemDto } from "./items.dto";
+import { CreateItemDto, UpdateItemDto } from "./items.dto";
 import {
   ApiOperation,
   ApiTags,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiParam,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
 } from "@nestjs/swagger";
@@ -55,10 +56,10 @@ export class ItemsController {
     },
   })
   public async create(
-    @Body() createItemDto: CreateItemDto,
+    @Body() itemData: CreateItemDto,
     @ReqUser() { id: userId }: CurrentUser
   ) {
-    return this.itemsService.create(createItemDto, userId);
+    return this.itemsService.create(itemData, userId);
   }
 
   @Get()
@@ -103,6 +104,11 @@ export class ItemsController {
 
   @Get(":id")
   @ApiOperation({ summary: "상품 조회", description: "상품 조회 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "itemId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: {
@@ -132,6 +138,11 @@ export class ItemsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "상품 수정", description: "상품 수정 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "itemId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: {
@@ -151,9 +162,9 @@ export class ItemsController {
   public async update(
     @Param("id", ParseIntPipe) id: number,
     @ReqUser() { id: userId }: CurrentUser,
-    @Body() item: any
+    @Body() updateItem: UpdateItemDto
   ) {
-    await this.itemsService.update(item, id, userId);
+    await this.itemsService.update(updateItem, id, userId);
     return "상품 수정 완료!";
   }
 
@@ -161,6 +172,11 @@ export class ItemsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "상품 삭제", description: "상품 삭제 api" })
+  @ApiParam({
+    name: "id",
+    required: true,
+    description: "itemId",
+  })
   @ApiCreatedResponse({
     description: "성공여부",
     schema: {

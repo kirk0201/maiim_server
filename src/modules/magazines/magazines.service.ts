@@ -13,7 +13,12 @@ import {
   MagazineRepository,
   MagazineCommentFindAllOptions,
 } from "./magazine.repository";
-import { CreateMagazineDto, CreateCommentDto } from "./magazines.dto";
+import {
+  CreateMagazineDto,
+  CreateCommentDto,
+  UpdateMagazineDto,
+  UpdateCommentDto,
+} from "./magazines.dto";
 
 @Injectable()
 export class MagazinesService {
@@ -22,8 +27,8 @@ export class MagazinesService {
     private readonly userRepository: UserRepository
   ) {}
 
-  public async create(createMagazineDto: CreateMagazineDto, userId: number) {
-    const { photo, title, body } = createMagazineDto;
+  public async create(magazineData: CreateMagazineDto, userId: number) {
+    const { photo, title, body } = magazineData;
 
     const findManager = await this.userRepository.findOne({ id: userId });
 
@@ -48,7 +53,11 @@ export class MagazinesService {
     return this.magazineRepository.findAll(options);
   }
 
-  public async update(magazine: any, magazineId: number, userId: number) {
+  public async update(
+    updateMagazine: UpdateMagazineDto,
+    magazineId: number,
+    userId: number
+  ) {
     const findMagazine = await this.magazineRepository.findOne({
       id: magazineId,
     });
@@ -60,10 +69,10 @@ export class MagazinesService {
     if (findManager.name !== "김대원")
       throw new UnauthorizedException("권한이 없습니다.");
 
-    if (magazine.title.length > 30)
+    if (updateMagazine.title.length > 30)
       throw new ForbiddenException("제목은 30자를 넘을 수 없습니다.");
 
-    await this.magazineRepository.update(magazineId, magazine);
+    await this.magazineRepository.update(magazineId, updateMagazine);
   }
 
   public async delete(magazineId: number, userId: number) {
@@ -83,11 +92,11 @@ export class MagazinesService {
   }
 
   public async comment(
-    createCommentDto: CreateCommentDto,
+    commentData: CreateCommentDto,
     magazineId: number,
     userId: number
   ) {
-    const { body } = createCommentDto;
+    const { body } = commentData;
 
     const comment = new MagazineComment({ body, magazineId, userId });
     await this.magazineRepository.saveMagazineComment(comment);
@@ -106,7 +115,7 @@ export class MagazinesService {
   }
 
   public async commentUpdate(
-    comment: any,
+    updateComment: UpdateCommentDto,
     commentId: number,
     magazineId: number,
     userId: number
@@ -121,7 +130,10 @@ export class MagazinesService {
     if (findComment.userId !== userId)
       throw new UnauthorizedException("권한이 없습니다.");
 
-    await this.magazineRepository.updateMagazineComment(commentId, comment);
+    await this.magazineRepository.updateMagazineComment(
+      commentId,
+      updateComment
+    );
   }
 
   public async commentDelete(

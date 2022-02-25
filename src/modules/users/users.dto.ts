@@ -1,7 +1,8 @@
 import { IsEmail, IsNotEmpty } from "class-validator";
+import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class joinUserDto {
+export class JoinUserDto {
   @IsEmail({}, { message: "이메일 형식으로 입력해주세요." })
   @ApiProperty({
     example: "kkt34343@gmail.com",
@@ -67,7 +68,7 @@ export class joinUserDto {
   gender: number;
 }
 
-export class loginDto {
+export class LoginDto {
   @IsEmail({}, { message: "이메일 형식으로 입력해주세요." })
   @ApiProperty({
     example: "kkt34343@gmail.com",
@@ -83,4 +84,71 @@ export class loginDto {
     required: true,
   })
   password: string;
+}
+
+// updateUserDto joinUserDto와 인터페이스 동일하나 필수 값이 아니다
+export class UpdateUserDto extends PartialType(JoinUserDto) {
+  @ApiProperty({
+    example: "비밀번호 변경",
+    description: "password",
+    required: false,
+  })
+  password?: string;
+
+  @ApiProperty({
+    example: "닉네임 변경",
+    description: "nickname",
+    required: false,
+  })
+  nickname?: string;
+
+  @ApiProperty({
+    example: "주소 변경",
+    description: "address",
+    required: false,
+  })
+  address?: string;
+
+  @ApiProperty({
+    example: "폰번호 변경",
+    description: "phone",
+    required: false,
+  })
+  phone?: string;
+}
+
+export class FindEmailDto {
+  @IsNotEmpty({ message: "이름을 입력해주세요." })
+  @ApiProperty({
+    example: "경태킴",
+    description: "name",
+    required: true,
+  })
+  name: string;
+
+  @IsNotEmpty({ message: "핸드폰 번호를 입력해주세요." })
+  @ApiProperty({
+    example: "010-2739-2271",
+    description: "phone",
+    required: true,
+  })
+  phone: string;
+}
+
+export class FindPwDto {
+  @IsEmail({}, { message: "이메일 형식으로 입력해주세요." })
+  @ApiProperty({
+    example: "kkt12121@naver.com",
+    description: "email",
+    required: true,
+  })
+  email: string;
+
+  @IsNotEmpty({ message: "이름을 입력해주세요." })
+  @ApiProperty({
+    example: "경태킴",
+    description: "name",
+    required: true,
+  })
+  name: string;
 }

@@ -3,7 +3,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { CreateItemDto } from "./items.dto";
+import { CreateItemDto, UpdateItemDto } from "./items.dto";
 import {
   ItemRepository,
   ItemFindOneOptions,
@@ -19,8 +19,8 @@ export class ItemsService {
     private readonly userRepository: UserRepository
   ) {}
 
-  public async create(createItemDto: CreateItemDto, userId: number) {
-    const { name, photo, category, itemDesc } = createItemDto;
+  public async create(itemData: CreateItemDto, userId: number) {
+    const { name, photo, category, itemDesc } = itemData;
 
     const item = new Item({ name, photo, category, itemDesc });
 
@@ -43,7 +43,11 @@ export class ItemsService {
     return this.itemRepository.findAll(options);
   }
 
-  public async update(item: any, itemId: number, userId: number) {
+  public async update(
+    updateItem: UpdateItemDto,
+    itemId: number,
+    userId: number
+  ) {
     const findItem = await this.itemRepository.findOne({ id: itemId });
 
     if (!findItem) throw new NotFoundException("해당 상품이 없습니다.");
@@ -53,7 +57,7 @@ export class ItemsService {
     if (findManager.name !== "김대원")
       throw new UnauthorizedException("권한이 없습니다.");
 
-    await this.itemRepository.update(itemId, item);
+    await this.itemRepository.update(itemId, updateItem);
   }
 
   public async delete(itemId: number, userId: number) {
