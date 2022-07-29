@@ -121,7 +121,7 @@ export class UsersService {
     if (!userEmail) throw new ForbiddenException("일치하는 회원이 없습니다.");
 
     const { email } = userEmail;
-
+    console.log(email)
     return { email };
   }
 
