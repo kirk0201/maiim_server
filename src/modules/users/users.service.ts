@@ -119,7 +119,7 @@ export class UsersService {
     const userEmail = await this.userRepository.findOne({ name, phone });
 
     if (!userEmail) throw new ForbiddenException("일치하는 회원이 없습니다.");
-
+    console.log(userEmail)
     const { email } = userEmail;
     console.log(email)
     return { email };
